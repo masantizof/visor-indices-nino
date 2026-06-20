@@ -3,6 +3,7 @@ import pandas as pd
 import plotly.express as px
 import json
 import os
+import base64
 
 # ─────────────────────────────────────────────────────────────────────────────
 # 1. CONFIGURACIÓN
@@ -14,6 +15,16 @@ st.set_page_config(
 )
 
 RUTA_BASE = os.path.dirname(os.path.abspath(__file__))
+
+def get_logo_b64():
+    path = os.path.join(RUTA_BASE, "LOGO_UNGRD.png")
+    try:
+        with open(path, "rb") as f:
+            return base64.b64encode(f.read()).decode()
+    except Exception:
+        return None
+
+_logo_b64 = get_logo_b64()
 GEOJSON_PATH = os.path.join(RUTA_BASE, "DatosIndice_simple.geojson")
 
 INDICES = {
@@ -133,7 +144,10 @@ geo_full, df_full = cargar_datos()
 # ─────────────────────────────────────────────────────────────────────────────
 with st.sidebar:
     st.markdown('<div class="cinta"></div>', unsafe_allow_html=True)
-    st.image("https://portal.gestiondelriesgo.gov.co/SiteAssets/logo-ungrd.png", width=140)
+    if _logo_b64:
+        st.markdown(f'<img src="data:image/png;base64,{_logo_b64}" width="140">', unsafe_allow_html=True)
+    else:
+        st.image("https://portal.gestiondelriesgo.gov.co/SiteAssets/logo-ungrd.png", width=140)
     st.markdown("### ⚙️ Filtros de análisis")
 
     indice_txt = st.selectbox("Índice de afectación:", list(INDICES.keys()))
@@ -560,7 +574,7 @@ with tab_info:
         <li>Índice de Pobreza Multidimensional: DANE.</li>
         <li>Cartografía oficial: IGAC / DANE – DIVIPOLA.</li>
       </ul>
-      <b>Elaborado por:</b> Christian Euscátegui — Subdirección para el Conocimiento del Riesgo (SCR / UNGRD)<br>
+      <b>Desarrollado por:</b> Moisés Santizo — Subdirección para el Conocimiento del Riesgo (SCR / UNGRD)<br>
       <b>Junio de 2026</b>
     </div>
     """, unsafe_allow_html=True)
